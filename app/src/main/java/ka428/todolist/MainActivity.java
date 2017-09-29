@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     CustomAdapter customAdapter;
     String cachename = "todolistcache.txt";
     String filename = "todolist.txt";
-
+    static Semaphore semaphore = new Semaphore(1);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             outputStream = openFileOutput(datafile, Context.MODE_PRIVATE);
+            semaphore.acquire();
             while(count < titlearr.size()) {
                 outputStream.write(titlearr.get(count).getBytes());
                 outputStream.write('\n');
@@ -129,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 outputStream.write('\n');
                 count++;
             }
+            semaphore.release();
             outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
